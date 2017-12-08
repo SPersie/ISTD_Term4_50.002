@@ -1,0 +1,26 @@
+//.include "/Users/study/Desktop/ISTD/Jsim/50002/finalALU.jsim"
+//.include "/Users/study/Desktop/ISTD/Jsim/50002/lab6pc.jsim"
+
+.subckt pc clk reset pcsel[2:0] ia[31:0] pcfour[31:0] 
++ c[31:0] jt[31:0] pcc[31:0]
+
+.connect temp[2] vdd
+.connect temp[31:3] temp[1:0] 0				//create binary number 4
+
+Xincr4 0 ia[31:0] temp[31:0] pcfour[31:0] z1 v1 n1 adder32	//increase pc by 4
+
+Xincrc 0 pcfour[31:0] c[31:0] pcc[31:0] z2 v2 n2 adder32	//increase pc by 4 +4*pc
+
+Xchangejt jt[31] ia[31] super31 and2			//superviosr bit 31
+
+Xillopb vdd 0#28 vdd 0#2 illop[31:0] buffer		//illegal opcode
+Xaddrpb vdd 0#27 vdd 0#3 xaddr[31:0] buffer		//addr opcode
+
+Xpcc pcsel[0]#32 pcsel[1]#32 ia[31] pcfour[30:0] ia[31] pcc[30:0] super31 jt[30:2] 0#2 illop[31:0] result[31:0] mux4
+
+Xpccc pcsel[2]#32 result[31:0] xaddr[31:0] resultt[31:0] mux2
+
+Xmux32b reset#32 resultt[31:0] vdd 0#31 d[31:0] mux2
+Xreg32b d[31:0] clk#32 ia[31:0] dreg
+
+.ends

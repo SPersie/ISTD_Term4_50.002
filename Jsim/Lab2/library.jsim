@@ -1,0 +1,49 @@
+.subckt nand2 a b z
+MPD1 z a 1 0 NENH sw=8 sl=1
+MPD2 1 b 0 0 NENH sw=8 sl=1
+MPU1 z a vdd vdd PENH sw=8 sl=1
+MPU2 z b vdd vdd PENH sw=8 sl=1
+.ends
+
+.subckt nand3 a b c z
+MPD1 z a 1 0 NENH sw=8 sl=1
+MPD2 1 b 2 0 NENH sw=8 sl=1
+MPD3 2 c 0 0 NENH sw=8 sl=1 
+MPU1 z a vdd vdd PENH sw=8 sl=1
+MPU2 z b vdd vdd PENH sw=8 sl=1
+MPU3 z c vdd vdd PENH sw=8 sl=1
+.ends
+
+
+.subckt nor2 a b z
+MPD1 z a 0 0 NENH sw=8 sl=1
+MPD2 z b 0 0 NENH sw=8 sl=1
+MPU1 z a 1 vdd PENH sw=10 sl=1
+MPU2 1 b vdd vdd PENH sw=10 sl=1
+.ends
+
+.subckt inverter a z
+MPD1 z a 0 0 NENH sw=16 sl=1
+MPU1 z a vdd vdd PENH sw=16 sl=1
+.ends
+
+.subckt xor a b z
+Xnor a b x nor2
+MPD1 3 b 0 0 NENH sw=2 sl=1
+MPD2 z a 3 0 NENH sw=2 sl=1
+MPD3 z x 0 0 NENH sw=2 sl=1
+
+MPU1 1 a vdd vdd PENH sw=4 sl=1
+MPU2 z x 1 vdd PENH sw=4 sl=1
+MPU3 1 b vdd vdd PENH sw=4 sl=1
+.ends
+
+.subckt xnor a b z
+Xnand a b x nand2
+MPD1 1 b 0 0 NENH sw=2 sl=1
+MPD2 1 a 0 0 NENH sw=2 sl=1
+MPD3 z x 1 0 NENH sw=2 sl=1
+MPU1 z x vdd vdd PENH sw=4 sl=1
+MPU2 z a 2 vdd PENH sw=4 sl=1
+MPU3 2 b vdd vdd PENH sw=4 sl=1
+.ends

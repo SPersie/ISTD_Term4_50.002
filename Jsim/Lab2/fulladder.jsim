@@ -1,0 +1,22 @@
+.include "/Users/study/Desktop/ISTD/Jsim/50002/nominal.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/8clocks.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/library.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/lab2checkoff.jsim"
+
+.subckt FA a b ci s co
+Xnand a b l nand2
+Xnand1 a ci m nand2
+Xnand2 b ci n nand2
+Xnand3 l m n co nand3
+Xxor1 a b o xor 
+Xxor2 o ci s xor
+.ends
+
+.subckt ADDER4 a3 a2 a1 a0 b3 b2 b1 b0 s4 s3 s2 s1 s0
+* remember the node named "0" is the ground node
+* nodes c0 through c3 are internal to the ADDER module
+Xbit0 a0 b0 0 s0 c0 FA
+Xbit1 a1 b1 c0 s1 c1 FA
+Xbit2 a2 b2 c1 s2 c2 FA
+Xbit3 a3 b3 c2 s3 s4 FA
+.ends

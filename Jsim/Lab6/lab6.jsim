@@ -1,0 +1,54 @@
+.include "/Users/study/Desktop/ISTD/Jsim/50002/finalALU.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/mypc.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/myregfile.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/myctl.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/lab6checkoff.jsim"
+
+
+.subckt beta clk reset irq ia[31:0] id[31:0] ma[31:0]
++ moe mrd[31:0] wr mwd[31:0]
+
+Xmypc clk reset pcsel[2:0] ia[31:0] pcfour[31:0] 
++ c[31:0] radata[31:0] pcc[31:0] pc				//create pc
+
+Xmyregfile clk werf ra2sel id[20:16] id[15:11] id[25:21] wasel
++ wdata[31:0] radata[31:0] mwd[31:0] regfile			//create regfile
+
+Xmyctl reset id[31:26] ra2sel wasell asel bsel alufn[5:0] 
++ wdsell[1:0] werff moe wrr pcsell[2:0] regz ctl		//create ctl
+
+Xmyalu alufn[5:0] radataalu[31:0] rbdataalu[31:0]
++ ma[31:0] z v n alu						//create alu
+
+//**************************************************************IRQ
+Xuser ia[31] usermode inverter
+Xirqq usermode irq irqresult and2
+
+Xirqpc irqresult#3 pcsell[2:0] vdd 0#2 pcsel[2:0] mux2
+Xirqwa irqresult wasell vdd wasel mux2
+Xirqwerf irqresult werff vdd werf mux2
+Xirqwdsel irqresult#2 wdsell[1:0] 0#2 wdsel[1:0] mux2
+Xirqwr irqresult wrr 0 wr mux2
+
+//***************************************************************Z
+Xzlogic 0 radata[31:0] 0#32 notused[31:0] regz vv nn adder32
+
+//***************************************************************create 4 *c
+Xcreate4c bsell[29:0] c[31:2] buffer
+Xcreate4cc 0#2 c[1:0] buffer
+
+//***************************************************************asel
+Xasell asel#32 radata[31:0] 0 pcc[30:0] radataalu[31:0] mux2
+
+
+XsextC1 id[15]#16 bsell[31:16] buffer
+XsextC2 id[15:0] bsell[15:0] buffer				//sign-extend
+
+Xbsell bsel#32 mwd[31:0] bsell[31:0] rbdataalu[31:0] mux2	//bsel
+
+Xjump radata[31:0] jt[31:0] buffer				//JT
+
+Xwdsell wdsel[0]#32 wdsel[1]#32 ia[31] pcfour[30:0] 
++ ma[31:0] mrd[31:0] 0#32 wdata[31:0] mux4			//wdsell
+
+.ends
