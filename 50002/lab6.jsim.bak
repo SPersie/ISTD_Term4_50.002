@@ -1,0 +1,30 @@
+.include "/Users/study/Desktop/ISTD/Jsim/50002/finalALU.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/mypc.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/myregfile.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/myctl.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/lab6basicblock.jsim"
+
+
+.subckt beta clk reset ia[31:0] id[31:0] ma[31:0]
++ moe mrd[31:0] wr mwd[31:0]
+
+Xmypc clk reset ia[31:0] pc				//create pc
+
+Xmyregfile clk werf ra2sel id[20:16] id[15:11] id[25:21]
++ wdata[31:0] radata[31:0] mwd[31:0] regfile		//create regfile
+
+Xmyctl reset id[31:26] ra2sel bsel alufn[5:0] 
++ wdsel[1:0] werf moe wr ctl				//create ctl
+
+XsextC1 id[15]#16 bsell[31:16] buffer
+XsextC2 id[15:0] bsell[15:0] buffer			//sign-extend
+
+Xbsell bsel#32 mwd[31:0] bsell[31:0] rbdata[31:0] mux2	//bsel
+
+Xmyalu alufn[5:0] radata[31:0] rbdata[31:0] 
++ ma[31:0] z v n alu					//create alu
+
+Xwdsell wdsel[0]#32 wdsel[1]#32 0#32 ma[31:0] mrd[31:0]
++ 0#32 wdata[31:0] mux4
+
+.ends

@@ -1,0 +1,16 @@
+.include "/Users/study/Desktop/Jsim/50002/nominal.jsim"
+.include "/Users/study/Desktop/Jsim/50002/lab1checkoff.jsim"
+
+.subckt F A B C Z
+
+MPD1 vf A v1 v1 NENH sw=8 sl=1
+MPD2 v1 B 0 0 NENH sw=8 sl=1
+MPD3 vf C 0 0 NENH sw=8 sl=1
+MPD4 Z vf 0 0 NENH sw=8 sl=1
+
+MPU1 vf A v2 v2 PENH sw=10 sl=1
+MPU2 vf B v2 v2 PENH sw=10 sl=1
+MPU3 v2 C vdd vdd PENH sw=10 sl=1
+MPU4 Z vf vdd vdd PENH sw=10 sl=1
+
+.ends

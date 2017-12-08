@@ -1,0 +1,13 @@
+//.include "/Users/study/Desktop/ISTD/Jsim/50002/finalALU.jsim"
+//.include "/Users/study/Desktop/ISTD/Jsim/50002/lab6pc.jsim"
+.subckt pc clk reset ia[31:0]
+
+Xregister32b d[31:0] clk#32 ia[31:0] dreg		//create pc register
+Xmux32b reset#32 s[31:0] 0#32 d[31:0] mux2		//32bit mux for reset
+
+.connect temp[2] vdd
+.connect temp[31:3] temp[1:0] 0				//create binary number 4
+
+Xincr 0 ia[31:0] temp[31:0] s[31:0] z v n adder32	//increase pc by 4
+
+.ends

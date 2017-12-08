@@ -1,0 +1,141 @@
+.include beta.uasm
+.include /Users/study/Desktop/ISTD/Jsim/50002/lab5checkoff.uasm
+
+|LDR(StackBase, SP)
+|CMOVE(0x1234, R1)
+|CMOVE(0x2222, R2)
+|PUSH(R1)
+|PUSH(R2)
+|BR(count_bull_cows, LP)
+|DEALLOCATE(2)
+|HALT()
+
+
+count_bull_cows:
+	PUSH(LP)
+	PUSH(BP)
+	MOVE(SP, BP)
+
+	PUSH(R3)            	|push a
+	PUSH(R4)            	|push b
+	PUSH(R5)            	|push bulls
+	PUSH(R6)            	|push cows
+	PUSH(R7)            	|push i
+	PUSH(R8)            	|push j
+	PUSH(R9)            	|push btemp
+	PUSH(R10)           	|push atry
+	PUSH(R11)           	|push btry
+	PUSH(R12)           	|push mask
+	PUSH(R13)		|push and result1 also as temp val
+	PUSH(R14)		|push and result2 also as temp val
+
+	LD(BP, -12, R3)     	|load a
+	LD(BP, -16, R4)     	|load b
+
+	CMOVE(0, R5)        	|set bulls to 0
+	CMOVE(0xF, R12)     	|set mask to 0xF
+
+|*********************************forloop**********************************
+	
+	CMOVE(0, R7)		|initiate for loop and set i to 0
+	BR(endfor32)
+
+for32:
+	|***********************************iffunction*********************
+	AND(R3, R12, R13)	|compute result of and 1
+	AND(R4, R12, R14)	|compute result of and 2
+	CMPEQ(R13, R14, R0)	|R0 is 1 if it is true
+	BEQ(R0, endif27)	|branch if R0 ==0
+
+	ADDC(R5, 1, R5)
+
+	OR(R3, R12, R3)
+	OR(R4, R12, R4)
+
+endif27:
+	SHLC(R12, 4, R12)
+	|***********************************iffunction end*****************
+
+	ADDC(R7, 1, R7)		|increase i by 1
+
+endfor32:
+	CMPLTC(R7, 4, R0)	|R0 is 1 if tests are true
+	BNE(R0, for32)		|contunue the for loop
+
+|*********************************forloop end*******************************
+
+	CMOVE(0, R6)		|set cows to 0
+
+|*********************************forloop1**********************************
+	
+	CMOVE(0, R7)		|initiate i to 0
+	BR(endfor33)
+for33:
+
+	ANDC(R3, 0xF, R10)	|store and result of a and 0xF in atry
+	SHRC(R3, 4, R3)
+	
+	|***********************************ifdunction**********************
+	CMPEQC(R10, 0xF, R0)	|R0 is 1 if atry==0xF
+	BNE(R0, endif28)
+	MOVE(R4, R9)     	|load b to btemp
+	CMOVE(0xF, R12)
+
+		|*********************forloop*******************************
+		CMOVE(0, R8)	|initiate j to 0
+		BR(endfor34)
+	for34:
+		ANDC(R9, 0xF, R11)
+		SHRC(R9, 4, R9)
+			|*************iffunction****************************
+			CMPEQ(R10, R11, R0)
+			BEQ(R0, endif29)
+			ADDC(R6, 1, R6)
+			OR(R4, R12, R4)
+|*************************************************
+			BR(endif28)
+|*************************************************
+		endif29:
+			SHLC(R12, 4, R12)
+
+			|*************endiffunction*************************
+		ADDC(R8, 1, R8)
+	endfor34:
+		CMPLTC(R8, 4, R0)
+		BNE(R0, for34)
+		|*********************forloopend****************************
+
+
+
+	endif28:
+	|***********************************endiffunction*******************
+
+	ADDC(R7, 1, R7)		|increase i by 1
+endfor33:
+	CMPLTC(R7, 4, R0)	|R0 is 1 if tests are true
+	BNE(R0, for33)		|contunue the for loop
+
+|*********************************forloop end*******************************
+	SHLC(R5, 4, R5)
+	ADD(R5, R6, R0)
+
+	POP(R14)
+	POP(R13)
+	POP(R12)
+	POP(R11)
+	POP(R10)
+	POP(R9)
+	POP(R8)
+	POP(R7)
+	POP(R6)
+	POP(R5)
+	POP(R4)
+	POP(R3)
+
+	MOVE(BP, SP)
+	POP(BP)
+	POP(LP)
+	RTN()
+
+StackBase: LONG(.+4)
+	. =. +0x1000

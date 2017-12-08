@@ -1,0 +1,95 @@
+.include "/Users/study/Desktop/ISTD/Jsim/50002/nominal.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/stdcell.jsim"
+.include "/Users/study/Desktop/ISTD/Jsim/50002/2dcheckoff_2p5ns.jsim"
+
+.subckt knex a b
+.connect a b
+.ends
+
+.subckt nor32 a[31:0] z
+Xnor01 a[3:0] z1 nor4
+Xnor02 a[7:4] z2 nor4
+Xnor03 a[11:8] z3 nor4
+Xnor04 a[15:12] z4 nor4
+Xnor05 a[19:16] z5 nor4
+Xnor06 a[23:20] z6 nor4
+Xnor07 a[27:24] z7 nor4
+Xnor08 a[31:28] z8 nor4
+Xnand01 z[1:4] z9 nand4
+Xnand02 z[5:8] z10 nand4
+Xnor32 z9 z10 z nor2
+.ends
+
+.subckt checkv a31 b31 s31 z
+Xinv_a a31 a31_inv inverter
+Xinv_b b31 b31_inv inverter
+Xinv_s s31 s31_inv inverter
+Xcheck1 a31 b31 s31_inv z1_inv nand3
+Xinv z1_inv z1 inverter
+Xcheck2 a31_inv b31_inv s31 z2_inv nand3
+Xinv2 z2_inv z2 inverter
+Xcheck3 z1 z2 z3 nor2
+Xinv3 z3 z inverter
+.ends
+
+//implement Block A
+.subckt blockA a b c g p s
+Xnand a b ig nand2
+Xinvg ig g inverter
+Xxorp a b p xor2
+Xsums p c s xor2
+.ends
+
+//implement Block B
+.subckt blockB gi pi gj pj ci gk pk cii cj
+Xinvc pi ci gi jc aoi21
+Xoutc jc cj inverter
+Xnandkp pi pj kp nand2
+Xoutpk kp pk inverter
+Xinvkg pj gi gj kg aoi21
+Xoutgk kg gk inverter
+.connect ci cii
+.ends
+
+//implement Block C
+.subckt blockC gi pi ci cii cj
+Xinvc pi ci gi jc aoi21
+Xoutc jc cj inverter
+.connect ci cii
+.ends
+
+//To determine add or sub
+.subckt aos op0 b xb
+Xxb op0 b xb xor2
+.ends
+
+// Main Program
+.subckt adder32 op0 A[31:0] B[31:0] S[31:0] z v n
+Xxa op0 Bop0 buffer_8
+
+//implement add or sub selecter
+Xsel B[31:0] Bop0#32  xb[31:0] aos
+
+//Layers of Block A
+XlayerA a[31:0] xb[31:0] c[31:0] gA[31:0] pA[31:0] s[31:0] blockA
+
+//Layers of Block B
+Xlayer1b gA[30:0:2]  pA[30:0:2]  gA[31:1:2]  pA[31:1:2]  cb[15:0] gB[15:0] p2b[15:0] C[30:0:2]   C[31:1:2]   blockB
+Xlayer2b gB[14:0:2] p2b[14:0:2] gB[15:1:2] p2b[15:1:2] c4b[7:0]  g3b[7:0]  p3b[7:0]  cb[14:0:2] cb[15:1:2] blockB
+Xlayer3b g3b[6:0:2]  p3b[6:0:2]  g3b[7:1:2]  p3b[7:1:2]  c5b[3:0]  g4b[3:0]  p4b[3:0]  c4b[6:0:2]  c4b[7:1:2]  blockB
+Xlayer4b g4b[2:0:2]  p4b[2:0:2]  g4b[3:1:2]  p4b[3:1:2]  c6b[1:0]  g5b[1:0]  p5b[1:0]  c5b[2:0:2]  c5b[3:1:2]  blockB
+Xlayer5b g5b0      p5b0     Bop0     c6b0      c6b1      blockC
+
+
+//implement z
+Xz S[31:0] z nor32
+
+//implement v
+Xv A[31] XB[31] S[31] v checkv
+
+//implement n
+.connect S[31] n
+
+.ends
+
+

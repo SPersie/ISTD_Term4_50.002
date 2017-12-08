@@ -1,0 +1,24 @@
+//.include "/Users/study/Desktop/ISTD/Jsim/50002/finalALU.jsim"
+//.include "/Users/study/Desktop/ISTD/Jsim/50002/lab6regfile.jsim"
+.subckt regfile clk werf ra2sel ra[4:0] rb[4:0] rc[4:0]
++ wdata[31:0] radata[31:0] rbdata[31:0]
+
+Xramux[4:0] ra2sel#5 rb[4:0] rc[4:0] ra2mux[4:0] mux2	//RA2SEL
+
+Xregfile
++ vdd 0 0 ra[4:0] adata[31:0]				//A read port
++ vdd 0 0 ra2mux[4:0] bdata[31:0]			//B read port
++ 0 clk werf rc[4:0] wdata[31:0]			//write port
++ $memory width=32 nlocations=31
+
+Xrda ra[4:0] adata[31:0] radata[31:0] r31test		//RD1
+Xrdb ra2mux[4:0] bdata[31:0] rbdata[31:0] r31test	//RD2
+
+.ends
+
+//***********R31************
+.subckt r31test a[4:0] b[31:0] c[31:0]
+Xaaaand a[4] a[3] a[2] a[1] aa[0] and4
+Xaand aa[0] a[0] sel[0] and2
+Xr31sel sel[0]#32 b[31:0] 0#32 c[31:0] mux2
+.ends
